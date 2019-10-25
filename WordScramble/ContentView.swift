@@ -9,18 +9,33 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var allWords = [String]()
     @State private var usedWords = [String]()
     @State private var rootWord = ""
     @State private var newWord = ""
     @State private var errorTitle = ""
     @State private var errorMessage = ""
     @State private var showingError = false
-    
+    var averageLetterCount: Double {
+        let length = usedWords.count
+        
+        if length == 0 {
+            return 0
+        }
+        
+        var count = 0
+        
+        for word in usedWords {
+            count += word.count
+        }
+        
+        return Double(count) / Double(length)
+    }
     
     func startGame() {
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
             if let startWords = try? String(contentsOf: startWordsURL) {
-                let allWords = startWords.components(separatedBy: "\n")
+                allWords = startWords.components(separatedBy: "\n")
                 
                 rootWord = allWords.randomElement() ?? "silkworm"
                 
@@ -29,6 +44,12 @@ struct ContentView: View {
         }
         
         fatalError("Could not load start.txt file from bundle.")
+    }
+    
+    func resetGame() {
+        rootWord = allWords.randomElement() ?? "silkworm"
+        usedWords = [String]()
+        newWord = ""
     }
     
     func addNewWord() {
@@ -101,13 +122,20 @@ struct ContentView: View {
                     Text($0)
                     Image(systemName: "\($0.count).circle")
                 }
-                .alert(isPresented: $showingError) {
-                    Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton:
-                        .default(Text("OK")))
+                Text("\(usedWords.count) words")
+                
+                 Text("\(averageLetterCount, specifier: "%.2f") average letter count per word")
+                    
+                    .alert(isPresented: $showingError) {
+                        Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton:
+                            .default(Text("OK")))
                 }
             }
             .navigationBarTitle(rootWord)
-            .onAppear(perform: startGame)
+            .navigationBarItems(leading: Button(action: resetGame) {
+                Text("New word")
+            })
+                .onAppear(perform: startGame)
         }
     }
 }
