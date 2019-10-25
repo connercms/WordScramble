@@ -113,6 +113,13 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
+                Text("How many words can you make from the word")
+                    .font(.callout)
+                
+                Text(rootWord)
+                    .font(.largeTitle)
+                    .foregroundColor(.blue)
+                
                 TextField("Enter new word", text: $newWord, onCommit: addNewWord)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
@@ -122,19 +129,20 @@ struct ContentView: View {
                     Text($0)
                     Image(systemName: "\($0.count).circle")
                 }
+                
                 Text("\(usedWords.count) words")
                 
-                 Text("\(averageLetterCount, specifier: "%.2f") average letter count per word")
+                Text("\(averageLetterCount, specifier: "%.0f") average letter count per word")
                     
                     .alert(isPresented: $showingError) {
                         Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton:
                             .default(Text("OK")))
                 }
             }
-            .navigationBarTitle(rootWord)
-            .navigationBarItems(leading: Button(action: resetGame) {
-                Text("New word")
-            })
+                //            .navigationBarTitle(rootWord)
+                .navigationBarItems(leading: Button(action: resetGame) {
+                    Text("New word")
+                })
                 .onAppear(perform: startGame)
         }
     }
